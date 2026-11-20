@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default-Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedOwner(userId) {
+      return isSignedIn()
+        && request.auth.uid == userId
+        && request.auth.token.email_verified == true;
+    }
+
+    function isValidUserBackup(data, userId) {
+      return data.keys().hasAll(['ownerId', 'notes', 'history', 'centerNames', 'overrides', 'updatedAt'])
+        && data.keys().hasOnly(['ownerId', 'notes', 'history', 'centerNames', 'overrides', 'updatedAt'])
+        && data.ownerId is string
+        && data.ownerId == request.auth.uid
+        && data.ownerId == userId
+        && data.ownerId.size() <= 128
+        && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.notes is list
+        && data.notes.size() <= 200
+        && (data.notes.size() == 0 || data.notes[0] is map)
+        && data.history is list
+        && data.history.size() <= 100
+        && (data.history.size() == 0 || data.history[0] is map)
+        && data.centerNames is map
+        && data.centerNames.keys().size() <= 20
+        && data.overrides is map
+        && data.overrides.keys().size() <= 150
+        && data.updatedAt is timestamp
+        && data.updatedAt == request.time;
+    }
+
+    match /test/connection {
+      allow get: if isSignedIn();
+    }
+
+    match /epi_users_backup/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false;
+      allow create: if isVerifiedOwner(userId)
+        && isValidId(userId)
+        && isValidUserBackup(incoming(), userId);
+      allow update: if isVerifiedOwner(userId)
+        && isValidId(userId)
+        && isValidUserBackup(incoming(), userId)
+        && incoming().ownerId == existing().ownerId
+        && incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'history', 'centerNames', 'overrides', 'updatedAt']);
+      allow delete: if isVerifiedOwner(userId)
+        && isValidId(userId)
+        && existing().ownerId == request.auth.uid;
+    }
+  }
+}

@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="appTitle">EPI & Health Care Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Firebase SDK (Compat Version for Single-File HTML) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #0d9488;
+      --primary-dark: #0f766e;
+      --accent-color: #059669;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    body {
+      font-family: 'Hind Siliguri', 'Segoe UI', SolaimanLipi, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-bottom: 85px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header-box {
+      background: linear-gradient(135deg, #064e3b 0%, #0f766e 55%, #0d9488 100%);
+      color: white;
+      padding: 18px 20px 22px 20px;
+      border-radius: 0 0 30px 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px -5px rgba(15, 118, 110, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .header-box::before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -30px;
+      width: 140px;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      transition: all 0.2s ease;
+    }
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .card-custom {
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 22px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      margin-bottom: 18px;
+      background: var(--card-bg);
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 20px 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-4px);
+      border-color: #14b8a6;
+      box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.16);
+    }
+    .icon-badge-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.55rem;
+      margin-bottom: 10px;
+    }
+    .dashboard-card h6 {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 2px;
+      font-size: 0.98rem;
+    }
+    .dashboard-card span.sub-hint {
+      font-size: 0.72rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .service-link-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: #0f172a;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+      transition: all 0.22s ease;
+    }
+    .service-link-card:hover {
+      background: #f0fdfa;
+      border-color: #0d9488;
+      transform: translateX(3px);
+      color: #0f766e;
+    }
+    .service-link-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .result-grid-box {
+      background: linear-gradient(145deg, #f0fdfa, #ecfdf5);
+      border: 1px solid #99f6e4;
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .vaccine-schedule-row {
+      background: #ffffff;
+      border: 1px solid #ccfbf1;
+      border-radius: 14px;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .vaccine-schedule-row:last-child { margin-bottom: 0; }
+    .v-row-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #0f766e, #0d9488);
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 14px;
+      padding: 12px 24px;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 16px -3px rgba(13, 148, 136, 0.35);
+    }
+    .btn-primary-custom:hover {
+      background: linear-gradient(135deg, #115e59, #0f766e);
+      color: white;
+    }
+
+    .microplan-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn-micro-action {
+      border-radius: 12px;
+      padding: 7px 14px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .table-container-sticky {
+      overflow-x: auto;
+      max-width: 100%;
+      position: relative;
+      border-radius: 16px;
+      border: 1px solid #cbd5e1;
+    }
+    .microplan-table {
+      font-size: 0.84rem;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 1100px;
+    }
+    .microplan-table th, .microplan-table td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 10px 8px !important;
+      background-color: #ffffff;
+      white-space: nowrap;
+    }
+    .microplan-table thead th {
+      background-color: #ccfbf1 !important;
+      color: #064e3b;
+      font-weight: 700;
+      border-bottom: 2px solid #0d9488;
+    }
+    .microplan-table .sticky-col-1 {
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      width: 75px;
+      min-width: 75px;
+      border-right: 2px solid #0d9488;
+    }
+    .microplan-table thead th.sticky-col-1 { z-index: 20; background-color: #99f6e4 !important; }
+
+    .vaccine-item-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid #0d9488;
+      border-radius: 16px;
+      padding: 15px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .disease-title-link {
+      color: #0f172a;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-btn-badge {
+      background: #f0fdfa;
+      color: #0d9488;
+      border: 1px solid #99f6e4;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+    }
+    .vaccine-pill-tag {
+      background: #f0fdfa;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+      font-weight: 700;
+      font-size: 0.84rem;
+      padding: 5px 14px;
+      border-radius: 30px;
+    }
+    .footer-text { text-align: center; padding: 16px; font-size: 0.85rem; color: #64748b; }
+    .photocard-modal-box {
+      background: #f8fafc;
+      border-left: 4px solid #0d9488;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .keep-input-card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+      border: 1px solid #e2e8f0;
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+    .keep-input-card.editing-mode { border: 2px solid #0d9488; }
+    .keep-note-card {
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .color-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid #cbd5e1;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .color-dot.active { transform: scale(1.2); border-color: #0d9488; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 6px 10px 6px;
+      z-index: 1000;
+    }
+    .bottom-nav-item {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.74rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      flex: 1;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .bottom-nav-item i {
+      font-size: 1.15rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 28px;
+      border-radius: 12px;
+      margin: 0 auto 2px auto;
+    }
+    .bottom-nav-item.active { color: #0f766e; font-weight: 700; }
+    .bottom-nav-item.active i { background: #ccfbf1; color: #0f766e; }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .sync-dot.synced { background-color: #34d399; box-shadow: 0 0 6px #34d399; }
+    .sync-dot.syncing { background-color: #fbbf24; animation: pulse 1s infinite; }
+    .sync-dot.offline { background-color: #94a3b8; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<!-- Google Cloud Auto-Sync Modal -->
+<div class="modal fade" id="googleSyncModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+      <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #064e3b, #0f766e); padding: 18px 24px;">
+        <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-cloud-arrow-up me-2"></i>ক্লাউড অটো-সিংক (Auto-Sync)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        
+        <!-- Signed Out View -->
+        <div id="googleSignedOutView">
+          <div class="bg-teal-50 text-teal-700 rounded-2xl d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+            <i class="fa-brands fa-google fs-2"></i>
+          </div>
+          <h6 class="fw-bold text-dark mb-1">Google অ্যাকাউন্ট দিয়ে অটো-সিংক চালু করুন</h6>
+          <p class="text-muted small mb-4">সাইন-ইন করলে আপনার সকল নোটস, মাইক্রোপ্লান ও হিস্ট্রি স্বয়ংক্রিয়ভাবে ক্লাউডে সেভ থাকবে। ফোন হারালেও নতুন ফোনে লগইন করলেই সব ডেটা ফিরে পাবেন।</p>
+          
+          <button onclick="signInWithGoogleCloud()" class="btn btn-primary-custom w-100 py-2.5 d-flex align-items-center justify-content-center gap-2">
+            <i class="fa-brands fa-google"></i>
+            <span>Sign in with Google</span>
+          </button>
+        </div>
+
+        <!-- Signed In View -->
+        <div id="googleSignedInView" class="d-none">
+          <img id="userAvatarImg" src="https://ui-avatars.com/api/?name=User&background=0f766e&color=fff" class="rounded-circle mb-2 shadow-sm mx-auto" style="width: 68px; height: 68px; object-fit: cover; border: 3px solid #ccfbf1;">
+          <h6 class="fw-bold text-dark mb-0 fs-5" id="userDisplayName">ব্যবহারকারী</h6>
+          <p class="text-muted small mb-2" id="userDisplayEmail">user@gmail.com</p>
+          
+          <div class="d-inline-flex align-items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-pill px-3 py-1.5 mb-3 small fw-semibold">
+            <span class="sync-dot synced" id="modalSyncDot"></span>
+            <span id="modalSyncStatusText">ক্লাউড অটো-সিংক চালু আছে</span>
+          </div>
+
+          <div class="d-grid gap-2 mt-2">
+            <button onclick="forceCloudSyncNow()" class="btn btn-outline-teal btn-sm rounded-xl py-2 fw-bold" style="border-color: #0d9488; color: #0f766e;">
+              <i class="fa-solid fa-rotate me-1"></i>এখনই সিংক করুন (Sync Now)
+            </button>
+            <button onclick="signOutGoogleCloud()" class="btn btn-outline-danger btn-sm rounded-xl py-2">সাইন-আউট করুন</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- History Sidebar -->
+<div class="offcanvas offcanvas-start border-0" tabindex="-1" id="historySidebar" style="border-radius: 0 24px 24px 0;">
+  <div class="offcanvas-header text-white" style="background: linear-gradient(135deg, #064e3b, #0f766e);">
+    <h5 class="offcanvas-title fw-bold" id="sidebarTitle"><i class="fa-solid fa-clock-rotate-left me-2"></i>সংরক্ষিত হিস্ট্রি</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <p class="text-muted small" id="sidebarDesc">পূর্বে এন্ট্রি করা জন্ম তারিখের তালিকা:</p>
+    <div id="historyList" class="list-group"></div>
+    <button onclick="clearAllHistory()" class="btn btn-outline-danger btn-sm w-100 mt-3 rounded-xl py-2" id="clearHistoryBtn"><i class="fa-solid fa-trash me-1"></i>সকল হিস্ট্রি মুছে ফেলুন</button>
+  </div>
+</div>
+
+<!-- Disease List Modal -->
+<div class="modal fade" id="diseaseListModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+      <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #064e3b, #0f766e); padding: 18px 24px;">
+        <h5 class="modal-title fw-bold mb-0" id="resTitle"><i class="fa-solid fa-shield-heart me-2"></i>রোগ ও টিকার তালিকা (Disease & Vaccine Name)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" style="background: #f8fafc;">
+        <p class="text-muted small mb-3" id="clickHintText"><i class="fa-solid fa-hand-pointer me-1 text-teal-600"></i>বিস্তারিত দেখতে রোগের নামের উপর ক্লিক করুন</p>
+        <div id="modalCardListContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Disease Detail Modal -->
+<div class="modal fade" id="diseaseModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+      <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #064e3b, #0f766e); padding: 18px 24px;">
+        <h5 class="modal-title fw-bold mb-0" id="modalDiseaseTitle"><i class="fa-solid fa-shield-virus me-2"></i>রোগের বিবরণ</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="photocard-modal-box">
+          <h6 class="fw-bold text-teal-800 mb-2" id="lblSymptomsHeader"><i class="fa-solid fa-stethoscope me-2"></i>লক্ষণসমূহ:</h6>
+          <p id="modalSymptoms" class="text-secondary mb-0" style="line-height: 1.65;"></p>
+        </div>
+        <div class="photocard-modal-box" style="border-left-color: #059669; margin-bottom: 0;">
+          <h6 class="fw-bold text-emerald-800 mb-2" id="lblPreventionHeader"><i class="fa-solid fa-kit-medical me-2"></i>প্রতিকার ও প্রতিরোধ:</h6>
+          <p id="modalPrevention" class="text-secondary mb-0" style="line-height: 1.65;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Header Banner -->
+<div class="header-box no-print">
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2.5">
+      <button onclick="goBack()" id="headerBackBtn" class="btn glass-btn btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="পিছনে যান">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="bg-white text-teal-800 rounded-2xl d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px;">
+        <i class="fa-solid fa-syringe text-teal-700 fs-5"></i>
+      </div>
+      <div>
+        <h5 class="mb-0 fw-bold" style="font-size: 1.05rem;" id="appHeaderTitle">EPI ও স্বাস্থ্য সেবা</h5>
+        <span class="d-block text-teal-100" style="font-size: 0.7rem;" id="appHeaderSub">সম্প্রসারিত টিকাদান কর্মসূচি</span>
+      </div>
+    </div>
+    
+    <div class="d-flex align-items-center gap-1.5">
+      <button onclick="openGoogleSyncModal()" id="headerGoogleBtn" class="btn glass-btn btn-sm fw-semibold px-2.5 py-1.5 d-flex align-items-center gap-1.5" style="border-radius: 14px; font-size: 0.74rem;" title="ক্লাউড অটো-সিংক">
+        <span class="sync-dot offline" id="headerSyncDot"></span>
+        <span id="headerGoogleText">অটো-সিংক</span>
+      </button>
+      <button onclick="toggleLanguage()" class="btn bg-white text-teal-900 btn-sm fw-bold shadow-sm px-2.5 py-1.5" id="langSwitchBtn" style="border-radius: 12px; font-size: 0.72rem;">EN</button>
+      <button class="btn glass-btn btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" type="button" data-bs-toggle="offcanvas" data-bs-target="#historySidebar" title="হিস্ট্রি">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container my-2" style="max-width: 820px;">
+
+  <div class="d-none">
+    <ul class="nav nav-pills" id="mainTab" role="tablist">
+      <li class="nav-item"><button class="nav-link active" id="epi-tab" data-bs-toggle="pill" data-bs-target="#epi" type="button">EPI</button></li>
+      <li class="nav-item"><button class="nav-link" id="microplan-tab" data-bs-toggle="pill" data-bs-target="#microplan" type="button">Microplan</button></li>
+      <li class="nav-item"><button class="nav-link" id="anc-tab" data-bs-toggle="pill" data-bs-target="#anc" type="button">ANC</button></li>
+      <li class="nav-item"><button class="nav-link" id="adolescent-tab" data-bs-toggle="pill" data-bs-target="#adolescent" type="button">Adolescent</button></li>
+      <li class="nav-item"><button class="nav-link" id="age-tab" data-bs-toggle="pill" data-bs-target="#age" type="button">Age</button></li>
+      <li class="nav-item"><button class="nav-link" id="notes-tab" data-bs-toggle="pill" data-bs-target="#notes" type="button">Notes</button></li>
+    </ul>
+  </div>
+
+  <div class="tab-content" id="mainTabContent">
+    
+    <!-- TAB 1: Dashboard Home -->
+    <div class="tab-pane fade show active" id="epi" role="tabpanel">
+      
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <div class="dashboard-card" onclick="switchTab('age')">
+            <div class="icon-badge-box" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-calculator"></i></div>
+            <h6 id="cardTitleAge">বয়স ক্যালকুলেটর</h6>
+            <span class="sub-hint" id="cardSubAge">নির্ভুল বয়স গণনা</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="dashboard-card" onclick="switchTab('microplan')">
+            <div class="icon-badge-box" style="background: #ccfbf1; color: #0f766e;"><i class="fa-solid fa-table-cells"></i></div>
+            <h6 id="cardTitleMicro">মাইক্রোপ্লান</h6>
+            <span class="sub-hint" id="cardSubMicro">বাৎসরিক সেশন তালিকা</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="dashboard-card" onclick="switchTab('anc')">
+            <div class="icon-badge-box" style="background: #ffe4e6; color: #e11d48;"><i class="fa-solid fa-heart-pulse"></i></div>
+            <h6 id="cardTitleAnc">ANC / EDD</h6>
+            <span class="sub-hint" id="cardSubAnc">গর্ভকালীন সেবা সূচি</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="dashboard-card" onclick="switchTab('adolescent')">
+            <div class="icon-badge-box" style="background: #f3e8ff; color: #7e22ce;"><i class="fa-solid fa-user-nurse"></i></div>
+            <h6 id="cardTitleAdo">কৈশোরকালীন সেবা</h6>
+            <span class="sub-hint" id="cardSubAdo">HPV ও Td শিডিউল</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- External Browser Links -->
+      <div class="d-flex flex-column gap-2.5 mb-3 no-print">
+        <a href="https://everify.bdris.gov.bd/" target="_blank" rel="noopener noreferrer" onclick="openExternalLink(event, this.href)" class="service-link-card">
+          <div class="d-flex align-items-center gap-3">
+            <div class="service-link-icon" style="background: #ecfdf5; color: #059669;"><i class="fa-solid fa-globe"></i></div>
+            <div>
+              <div class="fw-bold" style="font-size: 0.92rem;" id="btnBdrisPopupText">BDRIS অনলাইন জন্ম ও মৃত্যু নিবন্ধন যাচাই</div>
+              <div class="text-muted" style="font-size: 0.72rem;">everify.bdris.gov.bd</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-muted small"></i>
+        </a>
+
+        <a href="https://smarthealthbd.dghs.gov.bd/epi-card-download" target="_blank" rel="noopener noreferrer" onclick="openExternalLink(event, this.href)" class="service-link-card">
+          <div class="d-flex align-items-center gap-3">
+            <div class="service-link-icon" style="background: #eff6ff; color: #2563eb;"><i class="fa-solid fa-id-card"></i></div>
+            <div>
+              <div class="fw-bold" style="font-size: 0.92rem;" id="btnEpiCardDownloadText">EPI টিকা কার্ড ডাউনলোড</div>
+              <div class="text-muted" style="font-size: 0.72rem;">smarthealthbd.dghs.gov.bd</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-muted small"></i>
+        </a>
+      </div>
+
+      <!-- Child EPI Form -->
+      <div class="card card-custom p-4 no-print mb-3">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="rounded-xl d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: #ccfbf1; color: #0f766e;"><i class="fa-solid fa-syringe"></i></div>
+          <h5 class="card-title text-dark fw-bold mb-0" style="font-size: 1.05rem;" id="ageHeading">শিশুর টিকার তারিখ নির্ধারণ</h5>
+        </div>
+        <div class="row g-2">
+          <div class="col-12">
+            <label class="form-label text-muted small fw-bold mb-1" id="labelCalcDob">শিশুর জন্ম তারিখ নির্বাচন করুন:</label>
+            <input type="date" id="childDob" class="form-control rounded-xl py-2.5 mb-2">
+          </div>
+          <div class="col-12">
+            <button onclick="calculateEpi()" class="btn btn-primary-custom w-100 py-2.5">
+              <i class="fa-solid fa-calendar-check me-2"></i><span id="btnCalculateEpi">টিকার তারিখ দেখুন</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Child EPI Results -->
+      <div id="epiResults" class="d-none">
+        <div class="card card-custom p-4">
+          <div class="result-grid-box mb-3">
+            <div class="vaccine-schedule-row">
+              <div class="v-row-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-cake-candles"></i></div>
+              <span class="fw-bold text-dark" style="font-size: 0.96rem;" id="popupDobText">জন্মের তারিখ: --</span>
+            </div>
+            <div class="vaccine-schedule-row">
+              <div class="v-row-icon" style="background: #ccfbf1; color: #0f766e;"><i class="fa-solid fa-syringe"></i></div>
+              <span class="fw-bold text-teal-900" style="font-size: 0.96rem;" id="popupPentaText">পেন্টা ভ্যাকসিনের তারিখ (১ম ডোজ): --</span>
+            </div>
+            <div class="vaccine-schedule-row">
+              <div class="v-row-icon" style="background: #fef3c7; color: #d97706;"><i class="fa-solid fa-shield-virus"></i></div>
+              <span class="fw-bold text-dark" style="font-size: 0.96rem;" id="popupMr1Text">এমআর-১ ভ্যাকসিনের তারিখ: --</span>
+            </div>
+            <div class="vaccine-schedule-row">
+              <div class="v-row-icon" style="background: #f3e8ff; color: #7e22ce;"><i class="fa-solid fa-syringe"></i></div>
+              <span class="fw-bold text-dark" style="font-size: 0.96rem;" id="popupMr2Text">এমআর-২ ভ্যাকসিনের তারিখ: --</span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-center align-items-center no-print">
+            <button onclick="shareResult()" class="btn btn-outline-teal fw-bold px-4 py-2.5 w-100" style="border-radius: 14px; border: 1.5px solid #0d9488; color: #0f766e; background: #f0fdfa;">
+              <i class="fa-solid fa-share-nodes me-2"></i>ফলাফল শেয়ার করুন
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Annual Microplan -->
+    <div class="tab-pane fade" id="microplan" role="tabpanel">
+      <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <button onclick="goBack()" class="btn btn-light border btn-sm rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i><span class="back-btn-label">ব্যাক</span></button>
+            <h5 class="fw-bold mb-0 text-teal-900"><i class="fa-solid fa-table-list me-2 text-teal-600"></i><span id="microplanHeading">মাইক্রোপ্লান</span></h5>
+          </div>
+          
+          <div class="microplan-actions">
+            <button onclick="toggleMicroplanEdit()" id="editPlanBtn" class="btn btn-outline-primary btn-micro-action">
+              <i class="fa-solid fa-pen-to-square me-1"></i><span id="btnEditText">এডিট</span>
+            </button>
+            <button onclick="downloadMicroplanImage()" id="btnDownloadImage" class="btn btn-info text-white btn-micro-action">
+              <i class="fa-solid fa-file-image me-1"></i>ইমেজ
+            </button>
+            <button onclick="exportToExcel()" class="btn btn-success btn-micro-action">
+              <i class="fa-solid fa-file-excel me-1"></i>এক্সেল
+            </button>
+            <button onclick="resetMicroplanToDefault()" class="btn btn-outline-danger btn-micro-action" title="রিসেট">
+              <i class="fa-solid fa-rotate-left me-1"></i>রিসেট
+            </button>
+          </div>
+        </div>
+
+        <div class="no-print bg-teal-50/70 border border-teal-200 rounded-2xl p-3 mb-4 flex flex-wrap gap-4 items-center justify-between">
+            <div class="flex flex-wrap items-center gap-3">
+                <div>
+                    <label for="year-select" class="block text-xs font-bold text-teal-900 mb-1">বছর নির্বাচন:</label>
+                    <select id="year-select" onchange="onSettingChange()" class="bg-white border border-teal-400 text-gray-900 text-sm rounded-xl p-2 font-semibold"></select>
+                </div>
+                <div>
+                    <label for="pair-select" class="block text-xs font-bold text-teal-900 mb-1">প্রাথমিক সেশন জোড় বার:</label>
+                    <select id="pair-select" onchange="onSettingChange()" class="bg-white border border-teal-400 text-gray-900 text-sm rounded-xl p-2 font-semibold">
+                        <option value="mon-thu">সোম - বৃহস্পতিবার</option>
+                        <option value="sun-wed">রবি - বুধবার</option>
+                        <option value="sat-tue">শনি - মঙ্গলবার</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="microplanPrintArea" class="table-container-sticky bg-white p-3">
+          <div class="text-center mb-3" id="microplanCaptureHeader">
+            <h5 class="fw-bold text-teal-900 mb-0" id="printMicroplanTitle">বাৎসরিক ইপিআই টিকাদান সেশন মাইক্রোপ্লান</h5>
+            <p class="text-sm text-gray-600 fw-semibold mb-0" id="plan-year-title">বছর: ২০২৬</p>
+          </div>
+          <table class="table table-bordered microplan-table align-middle mb-0" id="microplanHtmlTable">
+            <thead>
+              <tr>
+                <th class="sticky-col-1" id="mWord">সাব ব্লক</th>
+                <th id="mCenter">কেন্দ্রের নাম ও ঠিকানা</th>
+                <th id="mJan">জানুয়ারি</th><th id="mFeb">ফেব্রুয়ারি</th><th id="mMar">মার্চ</th><th id="mApr">এপ্রিল</th>
+                <th id="mMay">মে</th><th id="mJun">জুন</th><th id="mJul">জুলাই</th><th id="mAug">আগস্ট</th>
+                <th id="mSep">সেপ্টেম্বর</th><th id="mOct">অক্টোবর</th><th id="mNov">নভেম্বর</th><th id="mDec">ডিসেম্বর</th>
+              </tr>
+            </thead>
+            <tbody id="microplanTableBody"></tbody>
+          </table>
+        </div>
+
+        <div id="savePlanBox" class="mt-3 text-end d-none no-print">
+          <button onclick="saveMicroplanChanges()" class="btn btn-success px-4 py-2 rounded-xl"><i class="fa-solid fa-floppy-disk me-1"></i><span id="savePlanBtnText">পরিবর্তন সেভ করুন</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ANC -->
+    <div class="tab-pane fade" id="anc" role="tabpanel">
+      <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title fw-bold mb-0 text-teal-900"><i class="fa-solid fa-heart-pulse me-2 text-rose-500"></i><span id="ancHeading">গর্ভাবস্থা ও ANC সেবার তারিখ নির্ধারণ</span></h5>
+          <button onclick="goBack()" class="btn btn-light border btn-sm rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i><span class="back-btn-label">ব্যাক</span></button>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold" id="labelAncType">হিসাবের ধরন বাছুন:</label>
+            <select id="ancCalcType" class="form-select rounded-xl py-2.5" onchange="toggleAncInput()">
+              <option value="lmp" id="optLmp">LMP থেকে EDD ও ANC বের করুন</option>
+              <option value="edd" id="optEdd">EDD থেকে LMP বের করুন</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label id="ancInputLabel" class="form-label text-muted small fw-bold">শেষ মাসিকের তারিখ (LMP):</label>
+            <input type="date" id="ancInputDate" class="form-control rounded-xl py-2.5">
+          </div>
+        </div>
+        <button onclick="calculateANC()" class="btn btn-primary-custom w-100 mb-4 py-2.5" id="btnCalculateAnc">হিসাব করুন</button>
+        <div id="ancResult" class="d-none border-top pt-3">
+          <div class="alert bg-teal-50 border border-teal-200 rounded-2xl text-teal-900" id="ancMainOutput"></div>
+          <h6 class="mt-3 fw-bold text-dark" id="ancVisitsTitle">চারটি প্রসবপূর্ব সেবা (ANC Visit) এর সময়সূচী:</h6>
+          <ul class="list-group list-group-flush rounded-2xl border overflow-hidden" id="ancVisits"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Adolescent -->
+    <div class="tab-pane fade" id="adolescent" role="tabpanel">
+      <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title fw-bold mb-0 text-teal-900"><i class="fa-solid fa-user-nurse me-2 text-purple-600"></i><span id="adoHeading">কৈশোরকালীন স্বাস্থ্য ও টিকাদান (HPV & Td)</span></h5>
+          <button onclick="goBack()" class="btn btn-light border btn-sm rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i><span class="back-btn-label">ব্যাক</span></button>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold" id="labelGirlDob">কিশোরীর জন্ম তারিখ:</label>
+            <input type="date" id="girlDob" class="form-control rounded-xl py-2.5">
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <button onclick="calculateAdolescent()" class="btn btn-primary-custom w-100 py-2.5" id="btnVerifyAdo">যাচাই করুন</button>
+          </div>
+        </div>
+        <div id="adolescentResult" class="d-none border-top pt-3">
+          <div id="ageStatusAlert" class="alert bg-teal-50 border border-teal-200 rounded-2xl text-teal-900"></div>
+          <div id="hpvBox" class="card p-3 mb-3 d-none border border-purple-200 bg-purple-50/40 rounded-2xl">
+            <h6 class="fw-bold text-purple-800"><i class="fa-solid fa-shield-virus me-2"></i>এইচপিভি (HPV) টিকা</h6>
+            <p id="hpvDateText" class="fw-bold mb-0 text-dark"></p>
+          </div>
+          <div id="tdBox" class="card p-3 d-none border border-teal-200 rounded-2xl">
+            <h6 class="fw-bold text-teal-800"><i class="fa-solid fa-syringe me-2"></i>টিডি (Td) টিকাদান শিডিউল (১৫ বছর পূর্ণ হলে)</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered mt-2 mb-0">
+                <thead class="table-light">
+                  <tr><th id="tdDose">ডোজ</th><th id="tdTime">প্রদেয় সময়</th><th id="tdDate">নির্ধারিত তারিখ</th></tr>
+                </thead>
+                <tbody id="tdTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: Age Calculator -->
+    <div class="tab-pane fade" id="age" role="tabpanel">
+      <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title fw-bold mb-0 text-teal-900"><i class="fa-solid fa-calculator me-2 text-sky-600"></i><span id="ageCalcTitle">বয়স ক্যালকুলেটর</span></h5>
+          <button onclick="goBack()" class="btn btn-light border btn-sm rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i><span class="back-btn-label">ব্যাক</span></button>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold" id="lblAgeDob">জন্ম তারিখ:</label>
+            <input type="date" id="calcDob" class="form-control rounded-xl py-2.5">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold" id="lblAgeTarget">যে তারিখ পর্যন্ত গণনা করতে চান:</label>
+            <input type="date" id="calcTargetDate" class="form-control rounded-xl py-2.5">
+          </div>
+        </div>
+        <button onclick="calculateGeneralAge()" class="btn btn-primary-custom w-100 mb-4 py-2.5" id="btnCalcGeneralAge">বয়স বের করুন</button>
+        <div id="ageResult" class="alert bg-sky-50 border border-sky-200 d-none rounded-2xl"></div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Google Keep Style Notes -->
+    <div class="tab-pane fade" id="notes" role="tabpanel">
+      <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title fw-bold mb-0 text-teal-900"><i class="fa-regular fa-note-sticky me-2 text-amber-500"></i><span id="notesHeading">নোটস (Keep Note)</span></h5>
+          <button onclick="goBack()" class="btn btn-light border btn-sm rounded-pill px-3"><i class="fa-solid fa-arrow-left me-1"></i><span class="back-btn-label">ব্যাক</span></button>
+        </div>
+
+        <div class="keep-input-card" id="keepInputBox" style="background-color: #ffffff;">
+          <div id="editModeBanner" class="d-none justify-content-between align-items-center mb-2 pb-1 border-bottom text-teal-800 small fw-bold">
+            <span><i class="fa-solid fa-pen-to-square me-1"></i><span id="editModeLabel">নোট এডিট করা হচ্ছে</span></span>
+            <button type="button" onclick="cancelEditNote()" class="btn btn-sm btn-link text-danger p-0 text-decoration-none fw-bold">বাতিল</button>
+          </div>
+          <input type="text" id="noteTitleInput" class="form-control border-0 bg-transparent fw-bold mb-1 shadow-none" placeholder="শিরোনাম (Title)...">
+          <textarea id="noteContentInput" class="form-control border-0 bg-transparent shadow-none" rows="3" placeholder="একটি নোট লিখুন..."></textarea>
+          
+          <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2" id="noteColorPicker">
+              <span class="color-dot active" data-color="#ffffff" style="background-color: #ffffff;" onclick="selectNoteColor('#ffffff', this)"></span>
+              <span class="color-dot" data-color="#fef3c7" style="background-color: #fef3c7;" onclick="selectNoteColor('#fef3c7', this)"></span>
+              <span class="color-dot" data-color="#d1fae5" style="background-color: #d1fae5;" onclick="selectNoteColor('#d1fae5', this)"></span>
+              <span class="color-dot" data-color="#dbeafe" style="background-color: #dbeafe;" onclick="selectNoteColor('#dbeafe', this)"></span>
+              <span class="color-dot" data-color="#fce7f3" style="background-color: #fce7f3;" onclick="selectNoteColor('#fce7f3', this)"></span>
+              <span class="color-dot" data-color="#f3e8ff" style="background-color: #f3e8ff;" onclick="selectNoteColor('#f3e8ff', this)"></span>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" id="btnCancelEditBottom" onclick="cancelEditNote()" class="btn btn-outline-secondary btn-sm px-3 py-1.5 d-none rounded-xl">বাতিল</button>
+              <button type="button" onclick="saveKeepNote()" class="btn btn-primary-custom btn-sm px-4 py-1.5" id="btnSaveNote">সেভ করুন</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <input type="text" id="noteSearchInput" oninput="renderKeepNotes()" class="form-control form-control-sm rounded-pill px-3 py-2" placeholder="নোট খুঁজুন...">
+        </div>
+
+        <div class="row g-3" id="keepNotesContainer"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-text no-print">
+    <p class="mb-0"><strong>© এস,এম,রাসেল কবির</strong></p>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav no-print">
+  <button class="bottom-nav-item active" onclick="switchTab('epi')" id="navBtnDashboard"><i class="fa-solid fa-house"></i>ড্যাশবোর্ড</button>
+  <button class="bottom-nav-item" onclick="openDiseaseListModal()" id="navBtnProfile"><i class="fa-solid fa-shield-virus"></i>রোগের তালিকা</button>
+  <button class="bottom-nav-item" onclick="switchTab('notes')" id="navBtnNotes"><i class="fa-regular fa-note-sticky"></i>নোটস</button>
+  <button class="bottom-nav-item" onclick="switchTab('microplan')" id="navBtnSettings"><i class="fa-solid fa-table-cells"></i>মাইক্রোপ্লান</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ================= EXTERNAL LINK HANDLER ================= */
+  function openExternalLink(e, url) {
+    if (window.AndroidInterface && typeof window.AndroidInterface.openUrl === 'function') {
+      e.preventDefault();
+      window.AndroidInterface.openUrl(url);
+    }
+  }
+
+  /* ================= FIREBASE CLOUD AUTO-SYNC ENGINE ================= */
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnCoX12-qzikBvrXCViWKaUBPl3aq5EY",
+    authDomain: "epischedule-4e96f.firebaseapp.com",
+    projectId: "epischedule-4e96f",
+    storageBucket: "epischedule-4e96f.appspot.com",
+    messagingSenderId: "805525147635",
+    appId: "1:805525147635:web:2626a1bc23875125354c86",
+    measurementId: "G-1LZS55LCF6"
+  };
+
+  let fbAuth = null;
+  let fbDb = null;
+  let currentCloudUser = null;
+  let unsubscribeCloudListener = null;
+
+  if (typeof firebase !== 'undefined') {
+    try {
+      firebase.initializeApp(firebaseConfig);
+      fbAuth = firebase.auth();
+      fbDb = firebase.firestore();
+      fbDb.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+    } catch (e) {
+      console.error("Firebase init error:", e);
+    }
+  }
+
+  function setSyncIndicator(status) {
+    const hDot = document.getElementById('headerSyncDot');
+    const mDot = document.getElementById('modalSyncDot');
+    const mText = document.getElementById('modalSyncStatusText');
+
+    [hDot, mDot].forEach(dot => {
+      if (!dot) return;
+      dot.classList.remove('synced', 'syncing', 'offline');
+      dot.classList.add(status);
+    });
+
+    if (mText) {
+      if (status === 'syncing') mText.innerText = 'ক্লাউডে সিংক হচ্ছে...';
+      else if (status === 'synced') mText.innerText = 'ক্লাউডের সাথে সম্পূর্ণ সিংক করা আছে';
+      else mText.innerText = 'অফলাইন মোড (সাইন-ইন করা নেই)';
+    }
+  }
+
+  function openGoogleSyncModal() {
+    var modal = new bootstrap.Modal(document.getElementById('googleSyncModal'));
+    modal.show();
+  }
+
+  function signInWithGoogleCloud() {
+    if (!fbAuth) return;
+    const provider = new firebase.auth.GoogleAuthProvider();
+    fbAuth.signInWithPopup(provider).catch(err => {
+      alert("Google Sign-In Error: " + err.message);
+    });
+  }
+
+  function signOutGoogleCloud() {
+    if (unsubscribeCloudListener) {
+      unsubscribeCloudListener();
+      unsubscribeCloudListener = null;
+    }
+    if (fbAuth) fbAuth.signOut();
+  }
+
+  async function pushDataToCloud() {
+    if (!currentCloudUser || !fbDb) return;
+    setSyncIndicator('syncing');
+
+    const payload = {
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      epiKeepNotes: localStorage.getItem('epiKeepNotes') || '[]',
+      epiHistory: localStorage.getItem('epiHistory') || '[]',
+      epi_center_names: localStorage.getItem('epi_center_names') || '{}',
+      overrides: {}
+    };
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('epi_overrides_')) {
+        payload.overrides[k] = localStorage.getItem(k);
+      }
+    }
+
+    try {
+      await fbDb.collection('epi_users_backup').doc(currentCloudUser.uid).set(payload, { merge: true });
+      setSyncIndicator('synced');
+    } catch (e) {
+      console.error("Cloud push failed:", e);
+      setSyncIndicator('offline');
+    }
+  }
+
+  function forceCloudSyncNow() {
+    pushDataToCloud();
+  }
+
+  function startRealtimeCloudSync(user) {
+    if (!fbDb) return;
+    setSyncIndicator('syncing');
+
+    const docRef = fbDb.collection('epi_users_backup').doc(user.uid);
+    unsubscribeCloudListener = docRef.onSnapshot((docSnap) => {
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        if (data.epiKeepNotes) localStorage.setItem('epiKeepNotes', data.epiKeepNotes);
+        if (data.epiHistory) localStorage.setItem('epiHistory', data.epiHistory);
+        if (data.epi_center_names) localStorage.setItem('epi_center_names', data.epi_center_names);
+        if (data.overrides && typeof data.overrides === 'object') {
+          Object.keys(data.overrides).forEach(k => {
+            localStorage.setItem(k, data.overrides[k]);
+          });
+        }
+        renderKeepNotes();
+        loadHistoryList();
+        onSettingChange();
+        setSyncIndicator('synced');
+      } else {
+        pushDataToCloud();
+      }
+    }, (error) => {
+      console.error("Snapshot listener error:", error);
+      setSyncIndicator('offline');
+    });
+  }
+
+  if (fbAuth) {
+    fbAuth.onAuthStateChanged((user) => {
+      currentCloudUser = user;
+      const signedOutView = document.getElementById('googleSignedOutView');
+      const signedInView = document.getElementById('googleSignedInView');
+      const headerGoogleText = document.getElementById('headerGoogleText');
+
+      if (user) {
+        signedOutView?.classList.add('d-none');
+        signedInView?.classList.remove('d-none');
+        document.getElementById('userDisplayName').innerText = user.displayName || 'User';
+        document.getElementById('userDisplayEmail').innerText = user.email || '';
+        if (user.photoURL) document.getElementById('userAvatarImg').src = user.photoURL;
+        if (headerGoogleText) headerGoogleText.innerText = (user.displayName || 'Synced').split(' ')[0];
+        
+        startRealtimeCloudSync(user);
+      } else {
+        signedOutView?.classList.remove('d-none');
+        signedInView?.classList.add('d-none');
+        if (headerGoogleText) headerGoogleText.innerText = currentLang === 'bn' ? 'অটো-সিংক' : 'Auto-Sync';
+        setSyncIndicator('offline');
+      }
+    });
+  }
+  /* ================================================================= */
+
+  let currentLang = localStorage.getItem('appLang') || 'bn';
+  let tabHistory = ['epi'];
+
+  const translations = {
+    bn: {
+      appTitle: "EPI & Health Care Management System",
+      appHeaderTitle: "EPI ও স্বাস্থ্য সেবা",
+      appHeaderSub: "সম্প্রসারিত টিকাদান কর্মসূচি",
+      langBtn: "EN",
+      cardTitleAge: "বয়স ক্যালকুলেটর",
+      cardSubAge: "নির্ভুল বয়স গণনা",
+      cardTitleMicro: "মাইক্রোপ্লান",
+      cardSubMicro: "বাৎসরিক সেশন তালিকা",
+      cardTitleAnc: "ANC / EDD",
+      cardSubAnc: "গর্ভকালীন সেবা সূচি",
+      cardTitleAdo: "কৈশোরকালীন সেবা",
+      cardSubAdo: "HPV ও Td শিডিউল",
+      ageHeading: "শিশুর টিকার তারিখ নির্ধারণ",
+      btnBdrisPopupText: "BDRIS অনলাইন জন্ম ও মৃত্যু নিবন্ধন যাচাই",
+      btnEpiCardDownloadText: "EPI টিকা কার্ড ডাউনলোড",
+      labelCalcDob: "শিশুর জন্ম তারিখ নির্বাচন করুন:",
+      btnCalculateEpi: "টিকার তারিখ দেখুন",
+      resTitle: "রোগ ও টিকার তালিকা (Disease & Vaccine Name)",
+      clickHintText: "বিস্তারিত দেখতে রোগের নামের উপর ক্লিক করুন",
+      lblSymptomsHeader: "লক্ষণসমূহ:",
+      lblPreventionHeader: "প্রতিকার ও প্রতিরোধ:",
+      microplanHeading: "মাইক্রোপ্লান",
+      btnEditText: "এডিট",
+      cancelBtn: "বাতিল",
+      printMicroplanTitle: "বাৎসরিক ইপিআই টিকাদান সেশন মাইক্রোপ্লান",
+      mWord: "সাব ব্লক", mCenter: "কেন্দ্রের নাম ও ঠিকানা",
+      mJan: "জানুয়ারি", mFeb: "ফেব্রুয়ারি", mMar: "মার্চ", mApr: "এপ্রিল", mMay: "মে", mJun: "জুন",
+      mJul: "জুলাই", mAug: "আগস্ট", mSep: "সেপ্টেম্বর", mOct: "অক্টোবর", mNov: "নভেম্বর", mDec: "ডিসেম্বর",
+      savePlanBtnText: "পরিবর্তন সেভ করুন",
+      ancHeading: "গর্ভাবস্থা ও ANC সেবার তারিখ নির্ধারণ",
+      labelAncType: "হিসাবের ধরন বাছুন:",
+      optLmp: "LMP থেকে EDD ও ANC বের করুন",
+      optEdd: "EDD থেকে LMP বের করুন",
+      labelLmpInput: "শেষ মাসিকের তারিখ (LMP):",
+      labelEddInput: "সম্ভাব্য প্রসবের তারিখ (EDD):",
+      btnCalculateAnc: "হিসাব করুন",
+      ancVisitsTitle: "চারটি প্রসবপূর্ব সেবা (ANC Visit) এর সময়সূচী:",
+      adoHeading: "কৈশোরকালীন স্বাস্থ্য ও টিকাদান (HPV & Td)",
+      labelGirlDob: "কিশোরীর জন্ম তারিখ:",
+      btnVerifyAdo: "যাচাই করুন",
+      tdDose: "ডোজ", tdTime: "প্রদেয় সময়",
+      sidebarTitle: "সংরক্ষিত হিস্ট্রি",
+      sidebarDesc: "পূর্বে এন্ট্রি করা জন্ম তারিখের তালিকা:",
+      clearHistoryBtn: "সকল হিস্ট্রি মুছে ফেলুন",
+      noHistory: "কোনো হিস্ট্রি সংরক্ষিত নেই।",
+      ageCalcTitle: "বয়স ক্যালকুলেটর",
+      lblAgeDob: "জন্ম তারিখ:",
+      lblAgeTarget: "যে তারিখ পর্যন্ত গণনা করতে চান:",
+      btnCalcGeneralAge: "বয়স বের করুন",
+      notesHeading: "নোটস (Keep Note)",
+      btnSaveNote: "সেভ করুন",
+      btnUpdateNote: "আপডেট করুন",
+      editModeLabel: "নোট এডিট করা হচ্ছে",
+      backLabel: "ব্যাক"
+    },
+    en: {
+      appTitle: "EPI & Health Care Management System",
+      appHeaderTitle: "EPI & Health Care",
+      appHeaderSub: "Expanded Programme on Immunization",
+      langBtn: "বাংলা",
+      cardTitleAge: "Age Calculator",
+      cardSubAge: "Exact age calculation",
+      cardTitleMicro: "Microplan",
+      cardSubMicro: "Annual session schedule",
+      cardTitleAnc: "ANC / EDD",
+      cardSubAnc: "Antenatal care schedule",
+      cardTitleAdo: "Adolescent Care",
+      cardSubAdo: "HPV & Td schedule",
+      ageHeading: "Child Vaccination Date Scheduler",
+      btnBdrisPopupText: "BDRIS Online Verification",
+      btnEpiCardDownloadText: "EPI Vaccination Card Download",
+      labelCalcDob: "Select Child's Date of Birth:",
+      btnCalculateEpi: "View Vaccine Dates",
+      resTitle: "Disease & Vaccine List",
+      clickHintText: "Click on a disease name to view detailed information",
+      lblSymptomsHeader: "Symptoms:",
+      lblPreventionHeader: "Treatment & Prevention:",
+      microplanHeading: "Microplan",
+      btnEditText: "Edit",
+      cancelBtn: "Cancel",
+      printMicroplanTitle: "Annual EPI Vaccination Session Microplan",
+      mWord: "Sub Block", mCenter: "Center Name & Address",
+      mJan: "January", mFeb: "February", mMar: "March", mApr: "April", mMay: "May", mJun: "June",
+      mJul: "July", mAug: "August", mSep: "September", mOct: "October", mNov: "November", mDec: "December",
+      savePlanBtnText: "Save Changes",
+      ancHeading: "Pregnancy & ANC Service Date Calculator",
+      labelAncType: "Select Calculation Type:",
+      optLmp: "Find EDD & ANC from LMP",
+      optEdd: "Find LMP from EDD",
+      labelLmpInput: "Last Menstrual Period (LMP):",
+      labelEddInput: "Estimated Due Date (EDD):",
+      btnCalculateAnc: "Calculate",
+      ancVisitsTitle: "Four Antenatal Care (ANC Visit) Schedule:",
+      adoHeading: "Adolescent Health & Immunization (HPV & Td)",
+      labelGirlDob: "Girl's Date of Birth:",
+      btnVerifyAdo: "Verify",
+      tdDose: "Dose", tdTime: "Scheduled Time",
+      sidebarTitle: "Saved History",
+      sidebarDesc: "List of previously entered dates of birth:",
+      clearHistoryBtn: "Clear All History",
+      noHistory: "No history saved.",
+      ageCalcTitle: "Age Calculator",
+      lblAgeDob: "Date of Birth:",
+      lblAgeTarget: "Calculate Age Up To:",
+      btnCalcGeneralAge: "Calculate Age",
+      notesHeading: "Notes (Keep Note)",
+      btnSaveNote: "Save Note",
+      btnUpdateNote: "Update Note",
+      editModeLabel: "Editing Note",
+      backLabel: "Back"
+    }
+  };
+
+  const epiDataConfig = {
+    bn: [
+      { vaccine: "বিসিজি (BCG)", disease: "১. যক্ষ্মা (Tuberculosis / TB)", key: "tuberculosis" },
+      { vaccine: "পেন্টা", disease: "২. ডিপথেরিয়া (Diphtheria)", key: "diphtheria" },
+      { vaccine: "পেন্টা", disease: "৩. পারটুসিস বা হুপিং কাশি", key: "pertussis" },
+      { vaccine: "পেন্টা", disease: "৪. টিটেনাস বা ধনুষ্টংকার", key: "tetanus" },
+      { vaccine: "পেন্টা", disease: "৫. হেপাটাইটিস বি (Hepatitis B)", key: "hepb" },
+      { vaccine: "পেন্টা", disease: "৬. হিমোফিলাস ইনফ্লুয়েঞ্জা বি (Hib)", key: "hib" },
+      { vaccine: "পিসিভি", disease: "৭. নিউমোনিয়া (Pneumonia)", key: "pneumonia" },
+      { vaccine: "ওপিভি", disease: "৮. পোলিও (Poliomyelitis)", key: "polio" },
+      { vaccine: "এমআর", disease: "৯. হাম (Measles)", key: "measles" },
+      { vaccine: "এমআর", disease: "১০. রুবেলা (Rubella)", key: "rubella" },
+      { vaccine: "টিসিভি", disease: "১১. টাইফয়েড (Typhoid)", key: "typhoid" }
+    ],
+    en: [
+      { vaccine: "BCG", disease: "1. Tuberculosis (TB)", key: "tuberculosis" },
+      { vaccine: "Penta", disease: "2. Diphtheria", key: "diphtheria" },
+      { vaccine: "Penta", disease: "3. Pertussis (Whooping Cough)", key: "pertussis" },
+      { vaccine: "Penta", disease: "4. Tetanus", key: "tetanus" },
+      { vaccine: "Penta", disease: "5. Hepatitis B", key: "hepb" },
+      { vaccine: "Penta", disease: "6. Haemophilus Influenzae B (Hib)", key: "hib" },
+      { vaccine: "PCV", disease: "7. Pneumonia", key: "pneumonia" },
+      { vaccine: "OPV", disease: "8. Poliomyelitis", key: "polio" },
+      { vaccine: "MR", disease: "9. Measles", key: "measles" },
+      { vaccine: "MR", disease: "10. Rubella", key: "rubella" },
+      { vaccine: "TCV", disease: "11. Typhoid", key: "typhoid" }
+    ]
+  };
+
+  const diseaseDetailInfo = {
+    bn: {
+      tuberculosis: { title: "১. যক্ষ্মা (Tuberculosis / TB)", symptoms: "৩ সপ্তাহের বেশি সময় ধরে কাশি, কাশির সাথে রক্ত যাওয়া, বুকে ব্যথা, বিকেলের দিকে হালকা জ্বর ও রাতে ঘাম হওয়া এবং ওজন কমে যাওয়া।", prevention: "জন্মের পর পর শিশুকে বিসিজি (BCG) টিকা দেওয়া। আক্রান্ত রোগীকে চিকিৎসকের পরামর্শে নিয়মিত ও পূর্ণ মেয়াদে ডটস (DOTS) পদ্ধতিতে ওষুধ সেবন করা।" },
+      diphtheria: { title: "২. ডিপথেরিয়া (Diphtheria)", symptoms: "তীব্র গলা ব্যথা, গিলতে কষ্ট হওয়া, হালকা জ্বর এবং গলায় ধূসর রঙের একটি শক্ত পর্দা বা আস্তরণ তৈরি হওয়া যা শ্বাসকষ্ট বাড়ায়।", prevention: "সময়মতো পেন্টাভ্যালেন্ট (Pentavalent) টিকা দেওয়া। আক্রান্ত রোগীকে দ্রুত অ্যান্টিটক্সিন ও অ্যান্টিবায়োটিক দেওয়া।" },
+      pertussis: { title: "৩. পারটুসিস বা হুপিং কাশি", symptoms: "তীব্র ও অনবরত কাশি, কাশির দমকে হুপিং বা ভেঁপুর মতো শব্দ হওয়া, কাশির পর বমি হওয়া বা দম আটকে যাওয়া।", prevention: "শিশুকে সময়মতো পেন্টাভ্যালেন্ট টিকা দেওয়া। চিকিৎসকের পরামর্শে অ্যান্টিবায়োটিক সেবন।" },
+      tetanus: { title: "৪. টিটেনাস বা ধনুষ্টংকার", symptoms: "চোয়াল শক্ত হয়ে মুখ খুলতে না পারা (Lockjaw), পুরো শরীর ধনুকের মতো বেঁকে যাওয়া এবং তীব্র মাংসপেশির খিঁচুনি।", prevention: "পেন্টাভ্যালেন্ট এবং টিটি (TT/Td) টিকা নেওয়া। যেকোনো কেটে যাওয়া বা ক্ষত স্থান দ্রুত জীবাণুনাশক দিয়ে পরিষ্কার করা।" },
+      hepb: { title: "৫. হেপাটাইটিস বি (Hepatitis B)", symptoms: "অতিরিক্ত দুর্বলতা, চোখ ও প্রস্রাব হলুদ হওয়া (জন্ডিস), বমি বমি ভাব, পেটে ব্যথা এবং লিভারের কার্যক্ষমতা নষ্ট হওয়া।", prevention: "জন্মের পর পর এবং নির্দিষ্ট শিডিউলে হেপাটাইটিস বি টিকা নেওয়া।" },
+      hib: { title: "৬. হিমোফিলাস ইনফ্লুয়েঞ্জা বি (Hib)", symptoms: "এটি মূলত শিশুদের মেনিনজাইটিস এবং তীব্র নিউমোনিয়া ঘটায়। লক্ষণ হিসেবে তীব্র জ্বর, ঘাড় শক্ত হয়ে যাওয়া, বমি এবং খিঁচুনি দেখা দেয়।", prevention: "সময়মতো পেন্টাভ্যালেন্ট টিকা দেওয়া।" },
+      pneumonia: { title: "৭. নিউমোনিয়া (Pneumonia)", symptoms: "তীব্র জ্বর, বুক ধড়ফড় করা এবং দ্রুত শ্বাস নেওয়া, শ্বাস নেওয়ার সময় বুকের খাঁচা নিচে দেবে যাওয়া।", prevention: "শিশুকে পিসিভি (PCV) টিকা দেওয়া।" },
+      polio: { title: "৮. পোলিও (Poliomyelitis)", symptoms: "হঠাৎ তীব্র জ্বর ও মাংসপেশিতে ব্যথা এবং খুব দ্রুত হাত বা পা অবশ (প্যারালাইসিস) হয়ে যাওয়া।", prevention: "মুখে খাওয়ার পোলিও টিকা (OPV) এবং ইনজেকশনের মাধ্যমে আইপিভি (IPV) টিকা নেওয়া।" },
+      measles: { title: "৯. হাম (Measles)", symptoms: "তীব্র জ্বর, সর্দি, চোখ লাল হওয়া ও চোখ দিয়ে জল পড়া এবং জ্বরের ৩-৪ দিন পর শরীরে লালচে দানা বা র‍্যাশ বের হওয়া।", prevention: "৯ মাস ও ১৫ মাস বয়সে এমআর (MR) টিকা দেওয়া।" },
+      rubella: { title: "১০. রুবেলা (Rubella)", symptoms: "হালকা জ্বর, শরীরে হালকা লালচে র‍্যাশ এবং কানের পেছনে বা ঘাড়ের গ্রন্থি ফুলে যাওয়া।", prevention: "সময়মতো এমআর (MR) টিকা নিশ্চিত করা।" },
+      typhoid: { title: "১১. টাইফয়েড (Typhoid)", symptoms: "ধাপে ধাপে জ্বর বাড়া (যা রাতে তীব্র হয়), প্রচণ্ড মাথাব্যথা, কোষ্ঠকাঠিন্য বা ডায়রিয়া।", prevention: "পরিচ্ছন্ন পানি পান করা এবং টাইফয়েড কনজুগেট টিকা (TCV) গ্রহণ করা।" }
+    },
+    en: {
+      tuberculosis: { title: "1. Tuberculosis (TB)", symptoms: "Cough lasting more than 3 weeks, coughing up blood, chest pain, evening fever.", prevention: "BCG vaccine at birth and full-course DOTS medication." },
+      diphtheria: { title: "2. Diphtheria", symptoms: "Severe sore throat, difficulty swallowing, gray pseudomembrane.", prevention: "Timely Pentavalent vaccine." },
+      pertussis: { title: "3. Pertussis", symptoms: "Severe coughing fits followed by a whooping sound.", prevention: "Timely Pentavalent vaccine." },
+      tetanus: { title: "4. Tetanus", symptoms: "Lockjaw, painful muscle stiffness.", prevention: "Pentavalent and TT/Td vaccination." },
+      hepb: { title: "5. Hepatitis B", symptoms: "Jaundice, fatigue, nausea.", prevention: "Hepatitis B vaccination schedule." },
+      hib: { title: "6. Hib Infection", symptoms: "Meningitis and pneumonia symptoms.", prevention: "Timely Pentavalent vaccination." },
+      pneumonia: { title: "7. Pneumonia", symptoms: "High fever, rapid breathing, chest indrawing.", prevention: "PCV vaccination for infants." },
+      polio: { title: "8. Poliomyelitis", symptoms: "Acute flaccid paralysis of limbs.", prevention: "OPV and IPV vaccination." },
+      measles: { title: "9. Measles", symptoms: "High fever, runny nose, red blotchy rash.", prevention: "MR vaccine doses at 9 and 15 months." },
+      rubella: { title: "10. Rubella", symptoms: "Mild fever, light pink rash, swollen lymph nodes.", prevention: "Timely MR vaccination." },
+      typhoid: { title: "11. Typhoid", symptoms: "Step-ladder fever pattern, severe headache.", prevention: "Safe water and TCV vaccination." }
+    }
+  };
+
+  function updateBottomNavActive(tabId) {
+    document.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+    if (tabId === 'epi') document.getElementById('navBtnDashboard')?.classList.add('active');
+    else if (tabId === 'microplan') document.getElementById('navBtnSettings')?.classList.add('active');
+    else if (tabId === 'notes') document.getElementById('navBtnNotes')?.classList.add('active');
+  }
+
+  function switchTab(tabId, isBack = false) {
+    const validTabs = ['epi', 'microplan', 'anc', 'adolescent', 'age', 'notes'];
+    const targetTab = validTabs.includes(tabId) ? tabId : 'epi';
+    const tabEl = document.getElementById(`${targetTab}-tab`);
+    if (tabEl) new bootstrap.Tab(tabEl).show();
+
+    if (!isBack && tabHistory[tabHistory.length - 1] !== targetTab) tabHistory.push(targetTab);
+    updateBottomNavActive(targetTab);
+    if (targetTab === 'notes') renderKeepNotes();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goBack() {
+    if (tabHistory.length > 1) {
+      tabHistory.pop();
+      switchTab(tabHistory[tabHistory.length - 1], true);
+    } else {
+      switchTab('epi', true);
+    }
+  }
+
+  function openDiseaseListModal() {
+    renderCardsIntoContainer('modalCardListContainer');
+    new bootstrap.Modal(document.getElementById('diseaseListModal')).show();
+  }
+
+  function showDiseaseDetails(key) {
+    const info = diseaseDetailInfo[currentLang][key] || { title: "রোগের বিবরণ", symptoms: "তথ্য পাওয়া যায়নি।", prevention: "নিয়মিত টিকা গ্রহণ করুন।" };
+    document.getElementById('modalDiseaseTitle').innerHTML = `<i class="fa-solid fa-shield-virus me-2"></i>${info.title}`;
+    document.getElementById('modalSymptoms').innerText = info.symptoms;
+    document.getElementById('modalPrevention').innerText = info.prevention;
+    new bootstrap.Modal(document.getElementById('diseaseModal')).show();
+  }
+
+  function renderCardsIntoContainer(containerId) {
+    const config = epiDataConfig[currentLang];
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    config.forEach((item) => {
+      container.innerHTML += `
+        <div class="vaccine-item-card">
+          <h6 class="mb-0 disease-title-link" onclick="showDiseaseDetails('${item.key}')">
+            <i class="fa-solid fa-shield-virus text-teal-600"></i> ${item.disease} 
+            <span class="info-btn-badge"><i class="fa-solid fa-info"></i></span>
+          </h6>
+          <div><span class="vaccine-pill-tag"><i class="fa-solid fa-syringe me-1"></i>${item.vaccine}</span></div>
+        </div>
+      `;
+    });
+  }
+
+  function applyLanguage() {
+    const t = translations[currentLang];
+    document.getElementById('appTitle').innerText = t.appTitle;
+    document.getElementById('sidebarTitle').innerHTML = `<i class="fa-solid fa-clock-rotate-left me-2"></i>${t.sidebarTitle}`;
+    document.getElementById('appHeaderTitle').innerText = t.appHeaderTitle;
+    document.getElementById('appHeaderSub').innerText = t.appHeaderSub;
+    document.getElementById('langSwitchBtn').innerText = t.langBtn;
+    document.getElementById('cardTitleAge').innerText = t.cardTitleAge;
+    document.getElementById('cardSubAge').innerText = t.cardSubAge;
+    document.getElementById('cardTitleMicro').innerText = t.cardTitleMicro;
+    document.getElementById('cardSubMicro').innerText = t.cardSubMicro;
+    document.getElementById('cardTitleAnc').innerText = t.cardTitleAnc;
+    document.getElementById('cardSubAnc').innerText = t.cardSubAnc;
+    document.getElementById('cardTitleAdo').innerText = t.cardTitleAdo;
+    document.getElementById('cardSubAdo').innerText = t.cardSubAdo;
+    document.getElementById('ageHeading').innerText = t.ageHeading;
+
+    if (document.getElementById('btnBdrisPopupText')) document.getElementById('btnBdrisPopupText').innerText = t.btnBdrisPopupText;
+    if (document.getElementById('btnEpiCardDownloadText')) document.getElementById('btnEpiCardDownloadText').innerText = t.btnEpiCardDownloadText;
+
+    document.getElementById('labelCalcDob').innerText = t.labelCalcDob;
+    document.getElementById('btnCalculateEpi').innerText = t.btnCalculateEpi;
+    document.getElementById('resTitle').innerText = t.resTitle;
+    document.getElementById('clickHintText').innerHTML = `<i class="fa-solid fa-hand-pointer me-1 text-teal-600"></i>${t.clickHintText}`;
+    document.getElementById('lblSymptomsHeader').innerHTML = `<i class="fa-solid fa-stethoscope me-2"></i>${t.lblSymptomsHeader}`;
+    document.getElementById('lblPreventionHeader').innerHTML = `<i class="fa-solid fa-kit-medical me-2"></i>${t.lblPreventionHeader}`;
+    document.getElementById('microplanHeading').innerText = t.microplanHeading;
+    document.getElementById('printMicroplanTitle').innerText = t.printMicroplanTitle;
+    document.getElementById('mWord').innerText = t.mWord;
+    document.getElementById('mCenter').innerText = t.mCenter;
+    
+    ['mJan','mFeb','mMar','mApr','mMay','mJun','mJul','mAug','mSep','mOct','mNov','mDec'].forEach(id => {
+      document.getElementById(id).innerText = t[id];
+    });
+
+    document.getElementById('savePlanBtnText').innerText = t.savePlanBtnText;
+    document.getElementById('ancHeading').innerText = t.ancHeading;
+    document.getElementById('labelAncType').innerText = t.labelAncType;
+    document.getElementById('optLmp').innerText = t.optLmp;
+    document.getElementById('optEdd').innerText = t.optEdd;
+    document.getElementById('btnCalculateAnc').innerText = t.btnCalculateAnc;
+    document.getElementById('ancVisitsTitle').innerText = t.ancVisitsTitle;
+    document.getElementById('adoHeading').innerText = t.adoHeading;
+    document.getElementById('labelGirlDob').innerText = t.labelGirlDob;
+    document.getElementById('btnVerifyAdo').innerText = t.btnVerifyAdo;
+    document.getElementById('tdDose').innerText = t.tdDose;
+    document.getElementById('tdTime').innerText = t.tdTime;
+    document.getElementById('sidebarDesc').innerText = t.sidebarDesc;
+    document.getElementById('clearHistoryBtn').innerHTML = `<i class="fa-solid fa-trash me-1"></i>${t.clearHistoryBtn}`;
+    document.getElementById('ageCalcTitle').innerText = t.ageCalcTitle;
+    document.getElementById('lblAgeDob').innerText = t.lblAgeDob;
+    document.getElementById('lblAgeTarget').innerText = t.lblAgeTarget;
+    document.getElementById('btnCalcGeneralAge').innerText = t.btnCalcGeneralAge;
+    document.getElementById('notesHeading').innerText = t.notesHeading;
+    document.getElementById('editModeLabel').innerText = t.editModeLabel;
+    document.getElementById('btnSaveNote').innerText = editingNoteId !== null ? t.btnUpdateNote : t.btnSaveNote;
+    document.querySelectorAll('.back-btn-label').forEach(el => el.innerText = t.backLabel);
+
+    const editBtnText = document.getElementById('btnEditText');
+    if(editBtnText) editBtnText.innerText = isMicroplanEditMode ? t.cancelBtn : t.btnEditText;
+    
+    toggleAncInput();
+    loadHistoryList();
+    if(lastDob) generateEpiCards(lastDob);
+  }
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'bn' ? 'en' : 'bn';
+    localStorage.setItem('appLang', currentLang);
+    applyLanguage();
+  }
+
+  /* ================= GOOGLE KEEP NOTES (WITH AUTO-SYNC) ================= */
+  let selectedNoteColor = '#ffffff';
+  let editingNoteId = null;
+
+  function getSavedNotes() {
+    try {
+      const data = JSON.parse(localStorage.getItem('epiKeepNotes') || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (e) { return []; }
+  }
+
+  function setSavedNotes(notesArray) {
+    localStorage.setItem('epiKeepNotes', JSON.stringify(notesArray));
+    pushDataToCloud();
+  }
+
+  function selectNoteColor(color, el) {
+    selectedNoteColor = color;
+    const inputBox = document.getElementById('keepInputBox');
+    if (inputBox) inputBox.style.backgroundColor = color;
+    document.querySelectorAll('#noteColorPicker .color-dot').forEach(dot => {
+      dot.classList.remove('active');
+      if (dot.getAttribute('data-color') === color) dot.classList.add('active');
+    });
+    if (el) el.classList.add('active');
+  }
+
+  function saveKeepNote() {
+    const title = document.getElementById('noteTitleInput')?.value.trim() || '';
+    const content = document.getElementById('noteContentInput')?.value.trim() || '';
+    if (!title && !content) {
+      alert(currentLang === 'bn' ? 'অনুগ্রহ করে নোটের শিরোনাম বা বিবরণ লিখুন।' : 'Please enter a note title or content.');
+      return;
+    }
+
+    let notes = getSavedNotes();
+    const dateStr = new Date().toLocaleDateString(currentLang === 'bn' ? 'bn-BD' : 'en-US');
+
+    if (editingNoteId !== null) {
+      notes = notes.map(note => String(note.id) === String(editingNoteId) ? { ...note, title, content, color: selectedNoteColor, date: dateStr } : note);
+    } else {
+      notes.unshift({ id: Date.now(), title, content, color: selectedNoteColor, pinned: false, date: dateStr });
+    }
+
+    setSavedNotes(notes);
+    cancelEditNote();
+    renderKeepNotes();
+  }
+
+  function startEditNote(id) {
+    const note = getSavedNotes().find(n => String(n.id) === String(id));
+    if (!note) return;
+
+    editingNoteId = note.id;
+    document.getElementById('noteTitleInput').value = note.title || '';
+    document.getElementById('noteContentInput').value = note.content || '';
+    selectNoteColor(note.color || '#ffffff');
+
+    document.getElementById('keepInputBox').classList.add('editing-mode');
+    const banner = document.getElementById('editModeBanner');
+    banner.classList.remove('d-none'); banner.classList.add('d-flex');
+    document.getElementById('btnCancelEditBottom').classList.remove('d-none');
+    document.getElementById('btnSaveNote').innerText = translations[currentLang].btnUpdateNote;
+  }
+
+  function cancelEditNote() {
+    editingNoteId = null;
+    if (document.getElementById('noteTitleInput')) document.getElementById('noteTitleInput').value = '';
+    if (document.getElementById('noteContentInput')) document.getElementById('noteContentInput').value = '';
+    selectNoteColor('#ffffff');
+    document.getElementById('keepInputBox')?.classList.remove('editing-mode');
+    const banner = document.getElementById('editModeBanner');
+    if (banner) { banner.classList.add('d-none'); banner.classList.remove('d-flex'); }
+    document.getElementById('btnCancelEditBottom')?.classList.add('d-none');
+    if (document.getElementById('btnSaveNote')) document.getElementById('btnSaveNote').innerText = translations[currentLang].btnSaveNote;
+  }
+
+  function togglePinNote(id) {
+    let notes = getSavedNotes().map(note => String(note.id) === String(id) ? { ...note, pinned: !note.pinned } : note);
+    setSavedNotes(notes);
+    renderKeepNotes();
+  }
+
+  function deleteKeepNote(id) {
+    if (confirm(currentLang === 'bn' ? 'আপনি কি এই নোটটি মুছে ফেলতে চান?' : 'Delete this note?')) {
+      if (String(editingNoteId) === String(id)) cancelEditNote();
+      setSavedNotes(getSavedNotes().filter(note => String(note.id) !== String(id)));
+      renderKeepNotes();
+    }
+  }
+
+  function changeExistingNoteColor(id, color) {
+    setSavedNotes(getSavedNotes().map(note => String(note.id) === String(id) ? { ...note, color } : note));
+    renderKeepNotes();
+  }
+
+  function renderKeepNotes() {
+    const container = document.getElementById('keepNotesContainer');
+    if (!container) return;
+
+    const searchQuery = (document.getElementById('noteSearchInput')?.value || '').toLowerCase();
+    let filtered = getSavedNotes().filter(n => 
+      (n.title && n.title.toLowerCase().includes(searchQuery)) || 
+      (n.content && n.content.toLowerCase().includes(searchQuery))
+    );
+    filtered.sort((a, b) => (b.pinned === true) - (a.pinned === true));
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="col-12 text-center text-muted py-4">${currentLang === 'bn' ? 'কোনো নোট পাওয়া যায়নি' : 'No notes found'}</div>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    const escapeHtml = (str) => String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));
+
+    filtered.forEach(note => {
+      const safeTitle = note.title ? `<h6 class="fw-bold mb-1 text-dark" style="cursor:pointer;" onclick="startEditNote(${note.id})">${escapeHtml(note.title)}</h6>` : '';
+      const safeContent = note.content ? `<p class="text-secondary small mb-3" style="white-space: pre-wrap; cursor:pointer;" onclick="startEditNote(${note.id})">${escapeHtml(note.content)}</p>` : '';
+
+      container.innerHTML += `
+        <div class="col-12 col-md-6">
+          <div class="keep-note-card" style="background-color: ${note.color || '#ffffff'};">
+            <div>
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                ${safeTitle || '<span></span>'}
+                <button type="button" onclick="togglePinNote(${note.id})" class="btn btn-sm p-0 border-0 ${note.pinned ? 'text-teal-700' : 'text-muted opacity-50'}">
+                  <i class="fa-solid fa-thumbtack"></i>
+                </button>
+              </div>
+              ${safeContent}
+            </div>
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-dark-subtle">
+              <small class="text-muted" style="font-size: 0.7rem;">${note.date || ''}</small>
+              <div class="d-flex align-items-center gap-1">
+                <span class="color-dot" style="width:14px;height:14px;background:#ffffff;" onclick="changeExistingNoteColor(${note.id}, '#ffffff')"></span>
+                <span class="color-dot" style="width:14px;height:14px;background:#fef3c7;" onclick="changeExistingNoteColor(${note.id}, '#fef3c7')"></span>
+                <span class="color-dot" style="width:14px;height:14px;background:#d1fae5;" onclick="changeExistingNoteColor(${note.id}, '#d1fae5')"></span>
+                <span class="color-dot" style="width:14px;height:14px;background:#dbeafe;" onclick="changeExistingNoteColor(${note.id}, '#dbeafe')"></span>
+                <button type="button" onclick="startEditNote(${note.id})" class="btn btn-sm text-primary p-0 ms-2 border-0"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button type="button" onclick="deleteKeepNote(${note.id})" class="btn btn-sm text-danger p-0 ms-2 border-0"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+  /* ================================================================= */
+
+  function toBnNum(n) {
+      if (n === null || n === undefined) return '';
+      const bnNums = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+      return n.toString().replace(/\d/g, d => bnNums[d]);
+  }
+
+  const dayShortBn = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'];
+  const monthNamesBn = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+
+  const displayCentersConfig = [
+      { code: "ক/১", name: "SDF ভবন, কাশিয়াডাঙ্গা দঃ পাড়া" },
+      { code: "ক/২", name: "মোতালেব মাষ্টার, কাশিয়াডাঙ্গা উঃপাড়া" },
+      { code: "খ/১", name: "ওজাহির মোড়ল, একড়া মোড়লপাড়া" },
+      { code: "খ/২", name: "মতিয়ার মোড়ল, বুঁইতা" },
+      { code: "গ/১", name: "সিসি, বাটরা" },
+      { code: "গ/২", name: "তবারক মাষ্টার, বাটরা বাজার" },
+      { code: "ঘ/১", name: "ছাত্তার মোড়ল, বাটরা বাজারের উঃ পাশে" },
+      { code: "ঘ/২", name: "আজগার মোড়ল, উত্তর বাঁটরা" }
+  ];
+
+  const executionOrderCodes = ["খ/২", "গ/১", "গ/২", "ঘ/১", "ঘ/২", "ক/১", "ক/২", "খ/১"];
+  const pairingRules = { 'mon-thu': [1, 4], 'sun-wed': [0, 3], 'sat-tue': [6, 2] };
+
+  let activeHolidays = [];
+  let currentPlanData = [];
+  let manualOverrides = {};
+  let customCenterNames = {};
+  let isMicroplanEditMode = false;
+  let lastDob = null;
+
+  function loadSavedOverrides(year) {
+      const saved = localStorage.getItem(`epi_overrides_${year}`);
+      manualOverrides = saved ? JSON.parse(saved) : {};
+      const savedNames = localStorage.getItem('epi_center_names');
+      customCenterNames = savedNames ? JSON.parse(savedNames) : {};
+  }
+
+  function saveOverridesToStorage(year) {
+      localStorage.setItem(`epi_overrides_${year}`, JSON.stringify(manualOverrides));
+      localStorage.setItem('epi_center_names', JSON.stringify(customCenterNames));
+      pushDataToCloud();
+  }
+
+  function getAutoGeneratedHolidays(year) {
+      let holidays = [
+          { date: `${year}-02-21`, name: "শহিদ দিবস" }, { date: `${year}-03-26`, name: "স্বাধীনতা দিবস" },
+          { date: `${year}-04-14`, name: "বাংলা নববর্ষ" }, { date: `${year}-05-01`, name: "মে দিবস" },
+          { date: `${year}-08-05`, name: "জুলাই গণঅভ্যুত্থান দিবস" }, { date: `${year}-12-16`, name: "বিজয় দিবস" },
+          { date: `${year}-12-25`, name: "বড়দিন" }
+      ];
+      if (year === 2026) {
+          ["2026-02-04","2026-03-17","2026-03-18","2026-03-19","2026-03-20","2026-03-21","2026-03-22","2026-03-23",
+           "2026-05-25","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-05-30","2026-06-26","2026-08-25",
+           "2026-09-04","2026-10-20","2026-10-21"].forEach(d => holidays.push({ date: d, name: "সরকারি ছুটি" }));
+      }
+      return holidays;
+  }
+
+  function initYearDropdown() {
+      const select = document.getElementById('year-select');
+      if (!select) return;
+      select.innerHTML = '';
+      for (let y = 2025; y <= 2150; y++) {
+          let opt = document.createElement('option');
+          opt.value = y; opt.innerText = toBnNum(y);
+          if (y === 2026) opt.selected = true;
+          select.appendChild(opt);
+      }
+  }
+
+  function isHoliday(dateObj) {
+      if (dateObj.getDay() === 5) return true;
+      const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+      return activeHolidays.some(h => h.date === dateStr);
+  }
+
+  function onSettingChange() {
+      const yearSelect = document.getElementById('year-select');
+      if (!yearSelect) return;
+      const year = parseInt(yearSelect.value);
+      loadSavedOverrides(year);
+      activeHolidays = [...getAutoGeneratedHolidays(year)];
+      generateMicroplan();
+  }
+
+  function generateMonthSessions(year, monthIndex, pairKey, minDatesMap = {}) {
+      const primaryPair = pairingRules[pairKey];
+      let lastDayDate = new Date(year, monthIndex + 1, 0).getDate();
+      let workingDays = [];
+      for (let d = 1; d <= lastDayDate; d++) {
+          if (!isHoliday(new Date(year, monthIndex, d))) workingDays.push(d);
+      }
+
+      let sessions = {};
+      let usedDatesInMonth = new Set();
+      for (let i = 0; i < executionOrderCodes.length; i++) {
+          let code = executionOrderCodes[i];
+          if (manualOverrides[code] && manualOverrides[code][monthIndex]) {
+              let manualDate = new Date(manualOverrides[code][monthIndex]);
+              sessions[code] = manualDate;
+              usedDatesInMonth.add(manualDate.getDate());
+              continue;
+          }
+          let minStartDay = 1;
+          if (minDatesMap[code] && minDatesMap[code].getFullYear() === year && minDatesMap[code].getMonth() === monthIndex) {
+              minStartDay = minDatesMap[code].getDate();
+          }
+          let candidateDays = workingDays.filter(d => d >= minStartDay && !usedDatesInMonth.has(d));
+          if (candidateDays.length === 0) candidateDays = workingDays.filter(d => !usedDatesInMonth.has(d));
+
+          let chosenDay = candidateDays.find(d => primaryPair.includes(new Date(year, monthIndex, d).getDay())) || candidateDays[0] || workingDays[0] || 1;
+          sessions[code] = new Date(year, monthIndex, chosenDay);
+          usedDatesInMonth.add(chosenDay);
+      }
+      return sessions;
+  }
+
+  function generateMicroplan() {
+      const year = parseInt(document.getElementById('year-select')?.value || 2026);
+      const pairKey = document.getElementById('pair-select')?.value || 'mon-thu';
+      const yearTitle = document.getElementById('plan-year-title');
+      if (yearTitle) yearTitle.innerText = `বছর: ${toBnNum(year)}`;
+
+      currentPlanData = displayCentersConfig.map(c => ({
+          code: c.code,
+          name: customCenterNames[c.code] || c.name,
+          dates: new Array(12)
+      }));
+
+      let minDatesMap = {};
+      for (let m = 0; m < 12; m++) {
+          let monthSessions = generateMonthSessions(year, m, pairKey, minDatesMap);
+          minDatesMap = {};
+          for (let code of executionOrderCodes) {
+              let currDate = monthSessions[code];
+              let minNextDate = new Date(currDate);
+              minNextDate.setDate(minNextDate.getDate() + 28);
+              minDatesMap[code] = minNextDate;
+              currentPlanData[currentPlanData.findIndex(c => c.code === code)].dates[m] = currDate;
+          }
+      }
+      renderTable();
+  }
+
+  function renderTable() {
+      const tbody = document.getElementById('microplanTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      currentPlanData.forEach((row, centerIdx) => {
+          let tr = document.createElement('tr');
+          let tdCode = document.createElement('td');
+          tdCode.className = 'border border-gray-300 p-2 font-bold bg-teal-50 text-teal-900 sticky-col-1';
+          tdCode.innerText = row.code;
+          tr.appendChild(tdCode);
+
+          let tdName = document.createElement('td');
+          tdName.className = 'border border-gray-300 p-2 text-left font-medium cursor-pointer';
+          tdName.innerHTML = `<span>${row.name}</span> ${isMicroplanEditMode ? '<span class="text-teal-600 no-print text-[10px]">✏️</span>' : ''}`;
+          if (isMicroplanEditMode) tdName.onclick = () => openCenterEditModal(centerIdx);
+          tr.appendChild(tdName);
+
+          row.dates.forEach((dObj, monthIdx) => {
+              let td = document.createElement('td');
+              td.className = 'border border-gray-300 p-1.5 transition relative' + (isMicroplanEditMode ? ' cursor-pointer hover:bg-amber-100' : '');
+              if (manualOverrides[row.code] && manualOverrides[row.code][monthIdx]) td.className += ' bg-amber-50/70 border-amber-300';
+
+              let gapText = '', isWarning = false;
+              if (monthIdx > 0) {
+                  let diffDays = Math.ceil(Math.abs(dObj - row.dates[monthIdx - 1]) / (1000 * 60 * 60 * 24));
+                  gapText = `${toBnNum(diffDays)} দিন`;
+                  if (diffDays < 28) isWarning = true;
+              }
+
+              td.innerHTML = `
+                  <div class="font-bold text-gray-900 text-sm">${toBnNum(dObj.getDate())}</div>
+                  <div class="text-[10px] text-gray-500 font-medium">${dayShortBn[dObj.getDay()]}</div>
+                  ${gapText ? `<div class="text-[9px] ${isWarning ? 'text-red-600 font-extrabold bg-red-50 rounded' : 'text-teal-700'} font-semibold mt-0.5">${gapText}</div>` : ''}
+              `;
+              if (isMicroplanEditMode) td.onclick = () => openEditModal(centerIdx, monthIdx);
+              tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+      });
+  }
+
+  function toggleMicroplanEdit() {
+      isMicroplanEditMode = !isMicroplanEditMode;
+      const t = translations[currentLang];
+      document.getElementById('btnEditText').innerText = isMicroplanEditMode ? t.cancelBtn : t.btnEditText;
+      document.getElementById('savePlanBox').classList.toggle('d-none', !isMicroplanEditMode);
+      renderTable();
+  }
+
+  function saveMicroplanChanges() {
+      const year = parseInt(document.getElementById('year-select')?.value || 2026);
+      saveOverridesToStorage(year);
+      toggleMicroplanEdit();
+      alert(currentLang === 'bn' ? "বাৎসরিক মাইক্রোপ্লানের নতুন তথ্য সফলভাবে সেভ ও সিংক করা হয়েছে!" : "Annual microplan updated & synced!");
+  }
+
+  function resetMicroplanToDefault() {
+      if (confirm(currentLang === 'bn' ? "ডিফল্ট শিডিউলে ফিরতে চান?" : "Reset microplan to default?")) {
+          const year = parseInt(document.getElementById('year-select')?.value || 2026);
+          localStorage.removeItem(`epi_overrides_${year}`);
+          manualOverrides = {};
+          pushDataToCloud();
+          generateMicroplan();
+      }
+  }
+
+  function openCenterEditModal(cIdx) {
+      let newName = prompt("কেন্দ্রের নাম ও বিস্তারিত স্থান লিখুন:", currentPlanData[cIdx].name);
+      if (newName && newName.trim() !== "") {
+          customCenterNames[currentPlanData[cIdx].code] = newName.trim();
+          currentPlanData[cIdx].name = newName.trim();
+          renderTable();
+      }
+  }
+
+  function openEditModal(centerIdx, monthIdx) {
+      let d = currentPlanData[centerIdx].dates[monthIdx];
+      let dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      let val = prompt(`${currentPlanData[centerIdx].code} - ${monthNamesBn[monthIdx]} মাসের নতুন তারিখ (YYYY-MM-DD):`, dateStr);
+      if (val) {
+          const parts = val.split('-');
+          if (parts.length === 3) {
+              let code = currentPlanData[centerIdx].code;
+              if (!manualOverrides[code]) manualOverrides[code] = {};
+              manualOverrides[code][monthIdx] = new Date(parts[0], parts[1] - 1, parts[2]);
+              generateMicroplan();
+          }
+      }
+  }
+
+  function downloadMicroplanImage() {
+      const area = document.getElementById('microplanPrintArea');
+      const table = document.getElementById('microplanHtmlTable');
+      if (!area || !table) return;
+      const year = document.getElementById('year-select')?.value || '2026';
+      const prevOverflow = area.style.overflowX, prevWidth = area.style.width;
+      const fullWidth = Math.max(table.scrollWidth + 32, 1150);
+      area.style.overflowX = 'visible'; area.style.width = fullWidth + 'px';
+
+      html2canvas(area, { scale: 2, backgroundColor: "#ffffff", width: fullWidth, windowWidth: fullWidth }).then(canvas => {
+          area.style.overflowX = prevOverflow; area.style.width = prevWidth;
+          canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.download = `EPI_Microplan_${year}.png`; link.href = url; link.click();
+              URL.revokeObjectURL(url);
+          }, 'image/png');
+      });
+  }
+
+  function exportToExcel() {
+      let yVal = document.getElementById('year-select')?.value || '2026';
+      let pVal = document.getElementById('pair-select')?.value || 'mon-thu';
+      if (typeof XLSX !== 'undefined') {
+          const headers = ["সাব ব্লক","কেন্দ্রের নাম ও ঠিকানা","জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+          const rows = currentPlanData.map(row => [row.code, row.name, ...row.dates.map(d => `${toBnNum(d.getDate())}/${toBnNum(d.getMonth() + 1)} (${dayShortBn[d.getDay()]})`)]);
+          const ws = XLSX.utils.aoa_to_sheet([[`বাৎসরিক ইপিআই টিকাদান সেশন মাইক্রোপ্লান - বছর: ${toBnNum(yVal)}`], [], headers, ...rows]);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, `Microplan_${yVal}`);
+          XLSX.writeFile(wb, `EPI_Microplan_${yVal}_${pVal}.xlsx`);
+      }
+  }
+
+  window.onload = function() {
+      applyLanguage();
+      initYearDropdown();
+      onSettingChange();
+      renderKeepNotes();
+      const targetInput = document.getElementById('calcTargetDate');
+      if (targetInput && !targetInput.value) targetInput.value = new Date().toISOString().split('T')[0];
+  };
+
+  function formatDate(dateObj) {
+    if (!dateObj || isNaN(dateObj.getTime())) return '-';
+    return `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+  }
+
+  function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  function saveToHistory(dob) {
+    let history = JSON.parse(localStorage.getItem('epiHistory') || '[]').filter(item => item.dob !== dob);
+    history.unshift({ dob: dob, time: new Date().toLocaleDateString() });
+    localStorage.setItem('epiHistory', JSON.stringify(history));
+    pushDataToCloud();
+    loadHistoryList();
+  }
+
+  function loadHistoryList() {
+    const historyList = document.getElementById('historyList');
+    if (!historyList) return;
+    let history = JSON.parse(localStorage.getItem('epiHistory') || '[]');
+    if (history.length === 0) {
+      historyList.innerHTML = `<p class="text-muted text-center my-3">${translations[currentLang].noHistory}</p>`;
+      return;
+    }
+    historyList.innerHTML = history.map(item => `
+      <a href="#" class="list-group-item list-group-item-action py-3 border-0 border-bottom" onclick="loadFromHistory('${item.dob}')">
+        <div class="d-flex w-100 justify-content-between">
+          <h6 class="mb-1 fw-bold text-teal-800">${currentLang === 'bn' ? 'জন্ম তারিখ:' : 'DOB:'} ${formatDate(new Date(item.dob))}</h6>
+          <small class="text-muted">${item.time}</small>
+        </div>
+      </a>`).join('');
+  }
+
+  function loadFromHistory(dob) {
+    document.getElementById('childDob').value = dob;
+    switchTab('epi');
+    calculateEpi();
+    bootstrap.Offcanvas.getInstance(document.getElementById('historySidebar'))?.hide();
+  }
+
+  function clearAllHistory() {
+    localStorage.removeItem('epiHistory');
+    pushDataToCloud();
+    loadHistoryList();
+  }
+
+  function calculateEpi() {
+    const dobVal = document.getElementById('childDob')?.value;
+    if (!dobVal) { alert(currentLang === 'bn' ? "শিশুর জন্মতারিখ দিন।" : "Please enter child's date of birth."); return; }
+    saveToHistory(dobVal);
+    lastDob = dobVal;
+    generateEpiCards(dobVal);
+  }
+
+  function generateEpiCards(dobVal) {
+    const dob = new Date(dobVal);
+    document.getElementById('popupDobText').innerText = `${currentLang === 'bn' ? 'জন্মের তারিখ:' : 'Date of Birth:'} ${formatDate(dob)}`;
+    document.getElementById('popupPentaText').innerText = `${currentLang === 'bn' ? 'পেন্টা ভ্যাকসিনের তারিখ (১ম ডোজ):' : 'Penta Vaccine Date (1st Dose):'} ${formatDate(addDays(dob, 42))}`;
+    document.getElementById('popupMr1Text').innerText = `${currentLang === 'bn' ? 'এমআর-১ ভ্যাকসিনের তারিখ:' : 'MR-1 Vaccine Date:'} ${formatDate(addDays(dob, 270))}`;
+    document.getElementById('popupMr2Text').innerText = `${currentLang === 'bn' ? 'এমআর-২ ভ্যাকসিনের তারিখ:' : 'MR-2 Vaccine Date:'} ${formatDate(addDays(dob, 450))}`;
+    document.getElementById('epiResults').classList.remove('d-none');
+  }
+
+  function shareResult() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'EPI Vaccination Date',
+        text: `${document.getElementById('popupDobText').innerText}\n${document.getElementById('popupPentaText').innerText}\n${document.getElementById('popupMr1Text').innerText}\n${document.getElementById('popupMr2Text').innerText}`,
+        url: window.location.href
+      }).catch(console.error);
+    }
+  }
+
+  function toggleAncInput() {
+    const type = document.getElementById('ancCalcType')?.value;
+    const t = translations[currentLang];
+    if (document.getElementById('ancInputLabel')) document.getElementById('ancInputLabel').innerText = type === 'lmp' ? t.labelLmpInput : t.labelEddInput;
+  }
+
+  function calculateANC() {
+    const dateVal = document.getElementById('ancInputDate')?.value;
+    if (!dateVal) { alert(currentLang === 'bn' ? "তারিখ দিন।" : "Please enter date."); return; }
+    const type = document.getElementById('ancCalcType')?.value || 'lmp';
+    const inputDate = new Date(dateVal);
+    let lmp = type === 'lmp' ? inputDate : addDays(inputDate, -280);
+    let edd = type === 'lmp' ? addDays(lmp, 280) : inputDate;
+
+    document.getElementById('ancMainOutput').innerHTML = `<h6 class="fw-bold mb-1">LMP: ${formatDate(lmp)}</h6><h6 class="fw-bold mb-0">EDD: ${formatDate(edd)}</h6>`;
+    document.getElementById('ancVisits').innerHTML = `
+      <li class="list-group-item py-2.5"><strong>${currentLang === 'bn' ? '১ম সেবা (ANC 1):' : 'ANC 1:'}</strong> ${currentLang === 'bn' ? '১৬ সপ্তাহের মধ্যে' : 'Within 16 weeks'} (${formatDate(addDays(lmp, 112))})</li>
+      <li class="list-group-item py-2.5"><strong>${currentLang === 'bn' ? '২য় সেবা (ANC 2):' : 'ANC 2:'}</strong> ${currentLang === 'bn' ? '২৪-২৮ সপ্তাহে' : '24-28 weeks'} (${formatDate(addDays(lmp, 168))})</li>
+      <li class="list-group-item py-2.5"><strong>${currentLang === 'bn' ? '৩য় সেবা (ANC 3):' : 'ANC 3:'}</strong> ${currentLang === 'bn' ? '৩২ সপ্তাহে' : '32 weeks'} (${formatDate(addDays(lmp, 224))})</li>
+      <li class="list-group-item py-2.5"><strong>${currentLang === 'bn' ? '৪র্থ সেবা (ANC 4):' : 'ANC 4:'}</strong> ${currentLang === 'bn' ? '৩৬ সপ্তাহে' : '36 weeks'} (${formatDate(addDays(lmp, 252))})</li>`;
+    document.getElementById('ancResult').classList.remove('d-none');
+  }
+
+  function calculateAdolescent() {
+    const dobVal = document.getElementById('girlDob')?.value;
+    if (!dobVal) { alert(currentLang === 'bn' ? "জন্ম তারিখ দিন।" : "Please enter date of birth."); return; }
+    const dob = new Date(dobVal), today = new Date();
+    let years = today.getFullYear() - dob.getFullYear(), months = today.getMonth() - dob.getMonth(), days = today.getDate() - dob.getDate();
+    if (days < 0) { months--; days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+    if (months < 0) { years--; months += 12; }
+
+    document.getElementById('ageStatusAlert').innerHTML = currentLang === 'bn'
+      ? `কিশোরীর বর্তমান বয়স: <strong>${toBnNum(years)} বছর, ${toBnNum(months)} মাস, ${toBnNum(days)} দিন</strong>`
+      : `Girl current age: <strong>${years} years, ${months} months, ${days} days</strong>`;
+
+    document.getElementById('hpvBox').classList.toggle('d-none', years < 10);
+    if (years >= 10) document.getElementById('hpvDateText').innerText = `${currentLang === 'bn' ? '১০ বছর পূর্ণ হওয়ার তারিখ:' : '10th birthday:'} ${formatDate(addDays(dob, 3650))}`;
+
+    document.getElementById('tdBox').classList.toggle('d-none', years < 15);
+    if (years >= 15) {
+      const td1 = addDays(dob, 5475);
+      document.getElementById('tdTableBody').innerHTML = `
+        <tr><td>Td-1</td><td>${currentLang === 'bn' ? '১৫ বছর পূর্ণ হলে' : 'At 15 years'}</td><td>${formatDate(td1)}</td></tr>
+        <tr><td>Td-2</td><td>${currentLang === 'bn' ? '৪ সপ্তাহ পর' : 'After 4 weeks'}</td><td>${formatDate(addDays(td1, 28))}</td></tr>
+        <tr><td>Td-3</td><td>${currentLang === 'bn' ? '৬ মাস পর' : 'After 6 months'}</td><td>${formatDate(addDays(td1, 208))}</td></tr>
+        <tr><td>Td-4</td><td>${currentLang === 'bn' ? '১ বছর পর' : 'After 1 year'}</td><td>${formatDate(addDays(td1, 573))}</td></tr>
+        <tr><td>Td-5</td><td>${currentLang === 'bn' ? '১ বছর পর' : 'After 1 year'}</td><td>${formatDate(addDays(td1, 938))}</td></tr>`;
+    }
+    document.getElementById('adolescentResult').classList.remove('d-none');
+  }
+
+  function calculateGeneralAge() {
+    const dobVal = document.getElementById('calcDob')?.value, targetVal = document.getElementById('calcTargetDate')?.value;
+    if (!dobVal || !targetVal) { alert(currentLang === 'bn' ? "উভয় তারিখ দিন।" : "Please enter both dates."); return; }
+    const dob = new Date(dobVal), target = new Date(targetVal);
+    let years = target.getFullYear() - dob.getFullYear(), months = target.getMonth() - dob.getMonth(), days = target.getDate() - dob.getDate();
+    if (days < 0) { months--; days += new Date(target.getFullYear(), target.getMonth(), 0).getDate(); }
+    if (months < 0) { years--; months += 12; }
+
+    const totalDays = Math.ceil(Math.abs(target - dob) / (1000 * 60 * 60 * 24));
+    const res = document.getElementById('ageResult');
+    res.innerHTML = `<h6 class="fw-bold text-sky-900 mb-1">${currentLang === 'bn' ? 'বয়স:' : 'Age:'} ${years} ${currentLang === 'bn' ? 'বছর' : 'years'}, ${months} ${currentLang === 'bn' ? 'মাস' : 'months'}, ${days} ${currentLang === 'bn' ? 'দিন' : 'days'}</h6><p class="mb-0 text-secondary">${currentLang === 'bn' ? 'সর্বমোট দিন:' : 'Total Days:'} ${totalDays}</p>`;
+    res.classList.remove('d-none');
+  }
+</script>
+</body>
+</html>

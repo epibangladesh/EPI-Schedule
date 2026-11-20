@@ -1,0 +1,11 @@
+{
+	"appId": "com.epihealthcare.app",
+	"appName": "EPI & Health Care",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"allowMixedContent": false
+	}
+}

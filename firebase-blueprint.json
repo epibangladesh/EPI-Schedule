@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "UserBackup": {
+      "title": "UserBackup",
+      "description": "Cloud-synced backup of a user's EPI Keep Notes, DOB history, custom sub-block center names, and annual microplan date overrides.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the backup owner.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "notes": {
+          "type": "array",
+          "description": "List of user Keep-style notes (up to 200 items)."
+        },
+        "history": {
+          "type": "array",
+          "description": "List of saved child DOB calculation history items (up to 100 items)."
+        },
+        "centerNames": {
+          "type": "object",
+          "description": "Map of sub-block code to custom center name & address."
+        },
+        "overrides": {
+          "type": "object",
+          "description": "Map of year key (epi_overrides_YYYY) to manual session date overrides."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last cloud sync update."
+        }
+      },
+      "required": ["ownerId", "notes", "history", "centerNames", "overrides", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/epi_users_backup/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserBackup"
+      },
+      "description": "Per-user private cloud backup document keyed by Firebase Auth UID."
+    }
+  }
+}

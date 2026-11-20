@@ -1,0 +1,6 @@
+{
+  "name": "EPI & Health Care",
+  "description": "Android-ready EPI & Health Care Management app for child immunization scheduling, annual microplan, ANC/EDD, adolescent vaccination, and cloud-synced notes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
